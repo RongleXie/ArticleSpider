@@ -7,5 +7,6 @@ from scrapy.cmdline import execute
 import sys
 import os
 
+# 模拟cmdline执行scrapy crawl jobbole命令，便于代码调试
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-execute(["scrapy","crawl","jobbole"])
+execute(["scrapy", "crawl", "jobbole"])
