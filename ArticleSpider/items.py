@@ -26,7 +26,7 @@ class ArticlespiderItemLoader(ItemLoader):
 # 转换日期
 def convert_date(value):
     try:
-        value = datetime.datetime.strptime(value, "%Y/%m/%d").date()
+        value = datetime.datetime.strptime(value.strip().replace('·','').strip(), "%Y/%m/%d").date()
     except Exception as e:
         value = datetime.datetime.now()
     return value
