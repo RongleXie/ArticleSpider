@@ -54,7 +54,7 @@ def remove_commont_tags(value):
 def return_value(value):
     return value
 
-
+# 伯乐在线文章Item
 class JobboleArticleItem(scrapy.Item):
     title = scrapy.Field()
     create_date = scrapy.Field(
@@ -80,3 +80,31 @@ class JobboleArticleItem(scrapy.Item):
         output_processor=Join(",")
     )
     content = scrapy.Field()
+
+
+# 知乎问题Item
+class ZhihuQuestionItem(scrapy.Item):
+    zhihu_id = scrapy.Field()
+    topics = scrapy.Field()
+    title = scrapy.Field()
+    url = scrapy.Field()
+    content = scrapy.Field()
+    answer_num = scrapy.Field()
+    comments_num = scrapy.Field()
+    watch_user_num = scrapy.Field()
+    click_num = scrapy.Field()
+    crawl_time = scrapy.Field()
+
+
+# 知乎问题回答Item
+class ZhihuAnswerItem(scrapy.Item):
+    zhihu_id = scrapy.Field()
+    url = scrapy.Field()
+    question_id = scrapy.Field()
+    author_id = scrapy.Field()
+    content = scrapy.Field()
+    parise_num = scrapy.Field()
+    comments_num = scrapy.Field()
+    create_time = scrapy.Field()
+    update_time = scrapy.Field()
+    crawl_time = scrapy.Field()
