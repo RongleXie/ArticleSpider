@@ -84,11 +84,6 @@ IMAGES_STORE = os.path.join(project_path,"images")
 # IMAGES_MIN_WIDTH = 100
 # IMAGES_MIN_HEIGHT = 100
 
-MYSQL_HOST = "127.0.0.1"
-MYSQL_DBNAME = "jobbole_article"
-MYSQL_USER = "root"
-MYSQL_PASSWORD = "950505"
-
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
 #AUTOTHROTTLE_ENABLED = True
@@ -109,3 +104,15 @@ MYSQL_PASSWORD = "950505"
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+# Mysql基本信息
+MYSQL_HOST = "127.0.0.1"
+MYSQL_DBNAME = "scrapy_spider"
+MYSQL_USER = "root"
+MYSQL_PASSWORD = "950505"
+
+# LOG_ENABLED = True
+SQL_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
+SQL_DATE_FORMAT = "%Y-%m-%d"
+
+RANDOM_UA_TYPE = "random"

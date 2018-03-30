@@ -76,13 +76,16 @@ class MysqlTwistedPipeline(object):
         print(failure)
 
     def do_insert(self, cursor, item):
-        sql = "insert into article(title,create_date,url,url_object_id,front_image_url,front_image_path,comment_nums,fav_nums,praise_nums,tags,content) " \
-              "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
-        cursor.execute(sql, (item.get("title",""),item.get("create_date",""), item.get("url",""),
-                             item.get("url_object_id",""), item.get("front_image_url",""),
-                             item.get("front_image_path",""), item.get("comment_nums",""),
-                             item.get("fav_nums",""), item.get("praise_nums",""),
-                             item.get("tags",""), item.get("content", "")))
+        # sql = "insert into article(title,create_date,url,url_object_id,front_image_url,front_image_path,comment_nums,fav_nums,praise_nums,tags,content) " \
+        #       "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+        # cursor.execute(sql, (item.get("title",""),item.get("create_date",""), item.get("url",""),
+        #                      item.get("url_object_id",""), item.get("front_image_url",""),
+        #                      item.get("front_image_path",""), item.get("comment_nums",""),
+        #                      item.get("fav_nums",""), item.get("praise_nums",""),
+        #                      item.get("tags",""), item.get("content", "")))
+
+        insert_sql, params = item.get_insert_sql()
+        cursor.execute(insert_sql,params)
 
 
 class ArticlePipeline(ImagesPipeline):
