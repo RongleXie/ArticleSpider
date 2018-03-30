@@ -116,3 +116,9 @@ SQL_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 SQL_DATE_FORMAT = "%Y-%m-%d"
 
 RANDOM_UA_TYPE = "random"
+
+
+# 将环境加入python path，加入后可直接import
+import sys
+BASE_DIR = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
+sys.path.insert(0, os.path.join(BASE_DIR, "ArticleSpider"))
