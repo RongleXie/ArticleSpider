@@ -34,7 +34,7 @@ class JsonWithEncodingPipeline(object):
 # 采用同步的方式存入Mysql数据库
 class MysqlPipeline(object):
     def __init__(self):
-        self.conn = MySQLdb.connect(host="127.0.0.1",user="root",password="950505",database="jobbole_article",charset="utf8",use_unicode = True)
+        self.conn = MySQLdb.connect(host="127.0.0.1",user="root",password="950505",database="scrapy_spider",charset="utf8",use_unicode = True)
         self.cursor = self.conn.cursor()
 
     def process_item(self, item, spider):
