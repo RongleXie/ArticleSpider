@@ -13,6 +13,7 @@ import re
 
 from ArticleSpider.settings import SQL_DATETIME_FORMAT
 from ArticleSpider.utils.common import extract_num
+from w3lib.html import remove_tags
 
 
 class ArticlespiderItem(scrapy.Item):
@@ -222,3 +223,144 @@ class ZhihuAnswerItem(scrapy.Item):
         )
 
         return insert_sql, params
+
+
+class LagouJobItemLoader(ItemLoader):
+    # 自定义ItemLoader
+    default_output_processor = TakeFirst()
+
+
+def remove_splash(value):
+    # 去掉工作城市的斜线
+    return value.replace("/", "")
+
+
+def handle_jobaddr(value):
+    addr_list = value.split("\n")
+    addr_list = [item.strip() for item in addr_list if item.strip() != "查看地图"]
+    return "".join(addr_list)
+
+
+# 拉勾网职位信息
+class LagouJobItem(scrapy.Item):
+    # 拉勾网职位信息
+    title = scrapy.Field()
+    url = scrapy.Field()
+    url_object_id = scrapy.Field()
+    salary_min = scrapy.Field()
+    salary_max = scrapy.Field()
+    job_city = scrapy.Field(
+        input_processor=MapCompose(remove_splash),
+    )
+    work_years_min = scrapy.Field(
+        input_processor=MapCompose(remove_splash),
+    )
+    work_years_max = scrapy.Field(
+        input_processor=MapCompose(remove_splash),
+    )
+    degree_need = scrapy.Field(
+        input_processor=MapCompose(remove_splash),
+    )
+    job_type = scrapy.Field()
+    publish_time = scrapy.Field()
+    job_advantage = scrapy.Field()
+    job_desc = scrapy.Field()
+    job_addr = scrapy.Field(
+        input_processor=MapCompose(remove_tags, handle_jobaddr),
+    )
+    company_name = scrapy.Field()
+    company_url = scrapy.Field()
+    tags = scrapy.Field(
+        input_processor=Join(",")
+    )
+    crawl_time = scrapy.Field()
+    crawl_update_time = scrapy.Field()
+
+    def get_insert_sql(self):
+        insert_sql = """
+                insert into lagou_job(title, url, url_object_id, salary_min, salary_max, job_city, work_years_min, work_years_max, degree_need,
+                job_type, publish_time, job_advantage, job_desc, job_addr, company_name, company_url,
+                tags, crawl_time) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE salary_min=VALUES(salary_min), salary_max=VALUES(salary_max), job_desc=VALUES(job_desc)
+            """
+
+        match_obj1 = re.match("经验(\d+)-(\d+)年", self['work_years_min'])
+        match_obj2 = re.match("经验应届毕业生", self['work_years_min'])
+        match_obj3 = re.match("经验不限", self['work_years_min'])
+        match_obj4 = re.match("经验(\d+)年以下", self['work_years_min'])
+        match_obj5 = re.match("经验(\d+)年以上", self['work_years_min'])
+
+        if match_obj1:
+            self['work_years_min'] = match_obj1.group(1)
+            self['work_years_max'] = match_obj1.group(2)
+        elif match_obj2:
+            self['work_years_min'] = 0.5
+            self['work_years_max'] = 0.5
+        elif match_obj3:
+            self['work_years_min'] = 0
+            self['work_years_max'] = 0
+        elif match_obj4:
+            self['work_years_min'] = 0
+            self['work_years_max'] = match_obj4.group(1)
+        elif match_obj5:
+            self['work_years_min'] = match_obj4.group(1)
+            self['work_years_max'] = match_obj4.group(1) + 100
+        else:
+            self['work_years_min'] = 999
+            self['work_years_max'] = 999
+
+        match_salary = re.match("(\d+)[Kk]-(\d+)[Kk]", self['salary_min'])
+        if match_salary:
+            self['salary_min'] = match_salary.group(1)
+            self['salary_max'] = match_salary.group(2)
+        else:
+            self['salary_min'] = 666
+            self['salary_max'] = 666
+        match_time1 = re.match("(\d+):(\d+).*", self["publish_time"])
+        match_time2 = re.match("(\d+)天前.*", self["publish_time"])
+        match_time3 = re.match("(\d+)-(\d+)-(\d+)", self["publish_time"])
+        if match_time1:
+            today = datetime.datetime.now()
+            hour = int(match_time1.group(1))
+            minutues = int(match_time1.group(2))
+            time = datetime.datetime(
+                today.year, today.month, today.day, hour, minutues)
+            self["publish_time"] = time.strftime(SQL_DATETIME_FORMAT)
+        elif match_time2:
+            days_ago = int(match_time2.group(1))
+            today = datetime.datetime.now() - datetime.timedelta(days=days_ago)
+            self["publish_time"] = today.strftime(SQL_DATETIME_FORMAT)
+        elif match_time3:
+            year = int(match_time3.group(1))
+            month = int(match_time3.group(2))
+            day = int(match_time3.group(3))
+            today = datetime.datetime(year, month, day)
+            self["publish_time"] = today.strftime(SQL_DATETIME_FORMAT)
+        else:
+            self["publish_time"] = datetime.datetime.now(
+            ).strftime(SQL_DATETIME_FORMAT)
+
+        params = (
+            self["title"],
+            self["url"],
+            self["url_object_id"],
+            self["salary_min"],
+            self["salary_max"],
+            self["job_city"],
+            self["work_years_min"],
+            self["work_years_max"],
+            self["degree_need"],
+            self["job_type"],
+            self["publish_time"],
+            self["job_advantage"],
+            self["job_desc"],
+            self["job_addr"],
+            self["company_name"],
+            self["company_url"],
+            self["tags"],
+            self["crawl_time"].strftime(SQL_DATETIME_FORMAT),
+        )
+
+        return insert_sql, params
+
+
