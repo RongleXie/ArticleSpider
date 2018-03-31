@@ -54,9 +54,11 @@ ROBOTSTXT_OBEY = False
 
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
-#    'ArticleSpider.middlewares.ArticlespiderDownloaderMiddleware': 543,
-#}
+DOWNLOADER_MIDDLEWARES = {
+    'ArticleSpider.middlewares.ArticlespiderDownloaderMiddleware': 543,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
+    'ArticleSpider.middlewares.RandomUserAgentMiddleware': 1
+}
 
 # Enable or disable extensions
 # See https://doc.scrapy.org/en/latest/topics/extensions.html
@@ -74,12 +76,12 @@ ITEM_PIPELINES = {
     'ArticleSpider.pipelines.MysqlTwistedPipeline': 30,
     # 'ArticleSpider.pipelines.JsonWithEncodingPipeline': 35
 }
-#图片Field字段
+# 图片Field字段
 IMAGES_URLS_FIELD = "front_image_url"
-#工程路径
+# 工程路径
 project_path = os.path.abspath(os.path.dirname(__file__))
-#图片存储路径
-IMAGES_STORE = os.path.join(project_path,"images")
+# 图片存储路径
+IMAGES_STORE = os.path.join(project_path, "images")
 
 # IMAGES_MIN_WIDTH = 100
 # IMAGES_MIN_HEIGHT = 100
@@ -115,6 +117,7 @@ MYSQL_PASSWORD = "950505"
 SQL_DATETIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 SQL_DATE_FORMAT = "%Y-%m-%d"
 
+# 获取UA的类型
 RANDOM_UA_TYPE = "random"
 
 
